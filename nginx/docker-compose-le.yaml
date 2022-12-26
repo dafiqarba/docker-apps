@@ -1,0 +1,19 @@
+version: "3.3"
+
+services:
+  certbot:
+    image: certbot/certbot
+    container_name: ${CERTBOT_SERVICE_NAME}
+    volumes:
+      # Store generated certificates
+      - ${LE_FILES_PATH}/etc/letsencrypt:/etc/letsencrypt
+      - ${ACME_FILES_PATH}/tmp/acme_challenge:/tmp/acme_challenge
+      - ${ACME_FILES_PATH}/www/.well-known:/var/www/.well-known
+      - ${LE_FILES_PATH}/ssl:/etc/letsencrypt
+      - ${LE_FILES_PATH}/ssl-log:/var/log/letsencrypt
+    profiles:
+      - certbot
+    command: sh -c "certbot certonly --webroot -w /tmp/acme_challenge -d sillyroach.com --text --agree-tos --email silly.cockroach@protonmail.com --rsa-key-size 4096 --verbose --keep-until-expiring --preferred-challenges=http"
+    entrypoint: ""
+    environment:
+      - TERM=xterm

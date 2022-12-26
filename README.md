@@ -1,1 +1,2 @@
-# docker-apps
+# docker-app
+self-hosted docker app

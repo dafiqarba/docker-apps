@@ -1,0 +1,25 @@
+version: "2.1"
+
+services:
+  app-qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: app-qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+      - WEBUI_PORT=8090
+    volumes:
+      - ./appdata/config:/config
+      - ./downloads:/downloads
+    ports:
+      - "127.0.0.1:8090:8090"
+      - "127.0.0.1:6881:6881"
+      - "127.0.0.1:6881:6881/udp"
+    restart: unless-stopped
+    networks:
+      - nginx-proxy
+
+networks:
+  nginx-proxy:
+    external: true

@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+
+    next-db:
+        image: "postgres:alpine"
+        restart: "always"      
+        volumes:
+            - "./postgres:/var/lib/postgresql/data"
+        env_file:
+            - db.env
+
+
+    next-redis:
+        image: "redis:alpine"
+        restart: "always"
+
+
+    next-app:
+        image: "nextcloud:fpm-alpine"
+        restart: "always"
+        volumes: 
+          - "./nextcloud:/var/www/html"
+        environment:
+          - POSTGRES_HOST=next-db
+          - REDIS_HOST=next-redis
+        env_file:
+          - db.env
+        depends_on:
+          - next-db
+          - next-redis
+
+    next-web:
+        build: ./web
+        restart: always
+        volumes:
+          - ./nextcloud:/var/www/html:ro
+        environment:
+          - VIRTUAL_HOST=nextcloud.sillyroach.com
+          - LETSENCRYPT_HOST=nextcloud.sillyroach.com
+          - LETSENCRYPT_EMAIL=silly.cockroach@protonmail.com
+        depends_on:
+          - next-app
+        networks:
+          - proxiednet
+          - default
+
+    next-cron:
+        image: nextcloud:fpm-alpine
+        restart: always
+        volumes:
+          - ./nextcloud:/var/www/html
+        entrypoint: /cron.sh
+        depends_on:
+          - next-db
+          - next-redis
+
+networks:
+  proxiednet:
