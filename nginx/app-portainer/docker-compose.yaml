@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+  portainer-ce:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    networks:
+      - nginx-proxy
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/box-app/portainer:/data
+    ports:
+      - '127.0.0.1:9000:9000'
+      - '127.0.0.1:8000:8000'
+
+networks:
+  nginx-proxy:
+    external: true
